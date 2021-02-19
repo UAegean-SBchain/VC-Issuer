@@ -34,7 +34,7 @@ const Layout = props => (
         flex: 1;
       }
     `}</style>
-    <Header />
+    <Header text={props.text} />
     <Container className="box-container">
       {props.children}
       {/* <div className="box">this is the footer</div> */}

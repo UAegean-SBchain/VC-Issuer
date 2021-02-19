@@ -28,7 +28,7 @@ class AuthorizeEbill extends React.Component {
       props.sessionData !== undefined &&
       props.sessionData.ebill !== undefined;
 
-    this.state = { error: null, vcSent:false };
+    this.state = { error: null, vcSent: false };
   }
 
   static async getInitialProps({ reduxStore, req }) {
@@ -85,12 +85,14 @@ class AuthorizeEbill extends React.Component {
     // values.source = "ebill";
     // let toSelect = [values];
     // this.props.setSefToSelection(toSelect);
-    let uri = `/endorse/ebill/authorization?verification=${verificationId}&session=${this.props.sealSession}`;
+    //this.props.baseUrl?`${this.props.baseUrl}eidas/eidas-authenticate${sessionFrag}`:`${this.props.baseUrl}/eidas/eidas-authenticate${sessionFrag}`;
+    let uri = this.props.baseUrl ? `${this.props.baseUrl}endorse/ebill/authorization?verification=${verificationId}&session=${this.props.sealSession}` :
+      `/endorse/ebill/authorization?verification=${verificationId}&session=${this.props.sealSession}`;
     axios
       .get(uri)
       .then((data) => {
-         this.setState({
-          vcSent:true
+        this.setState({
+          vcSent: true
         });
       })
       .catch((error) => {
@@ -149,40 +151,40 @@ class AuthorizeEbill extends React.Component {
     );
 
     let result = this.state.error ? (
-      <div style={{marginTop:"3rem"}}>
+      <div style={{ marginTop: "3rem" }}>
         Η υπεύθυνη δήλωση που παρείχατε δεν πιστοποιεί τις ζητούμενες
         διαπιστεύσεις
       </div>
-    ) : 
-      this.state.vcSent? (
-        <div style={{marginTop:"3rem"}}>
+    ) :
+      this.state.vcSent ? (
+        <div style={{ marginTop: "3rem" }}>
           Το διαπιστευτήριον έχει αποσταλεί στο κινητό του χρήστη με επιτυχία
         </div>
-      ):
-    
-    (
-      <PairOrCard
-        qrData={this.props.qrData}
-        DID={this.props.DID}
-        baseUrl={this.props.baseUrl}
-        uuid={this.props.uuid}
-        serverSessionId={this.props.sealSession}
-        card={theCard}
-        vcSent={this.props.vcSent}
-        sealSession={this.props.sealSession}
-        formDataUploaded={
-          this.props.sessionData !== null &&
-          this.props.sessionData !== undefined &&
-          this.props.sessionData.ebill !== undefined
-        }
-        selfForm={
-          <EndorsedEBillForm
-            onSubmit={this.submit}
-            endorsed={this.props.endorsement}
+      ) :
+
+        (
+          <PairOrCard
+            qrData={this.props.qrData}
+            DID={this.props.DID}
+            baseUrl={this.props.baseUrl}
+            uuid={this.props.uuid}
+            serverSessionId={this.props.sealSession}
+            card={theCard}
+            vcSent={this.props.vcSent}
+            sealSession={this.props.sealSession}
+            formDataUploaded={
+              this.props.sessionData !== null &&
+              this.props.sessionData !== undefined &&
+              this.props.sessionData.ebill !== undefined
+            }
+            selfForm={
+              <EndorsedEBillForm
+                onSubmit={this.submit}
+                endorsed={this.props.endorsement}
+              />
+            }
           />
-        }
-      />
-    );
+        );
 
     return (
       <Layout>
@@ -205,6 +207,7 @@ function mapStateToProps(state) {
     sessionData: state.appReducer.sessionData,
     DID: true,
     sealSession: state.appReducer.sealSession,
+    baseUrl: state.appReducer.baseUrl
   };
 }
 

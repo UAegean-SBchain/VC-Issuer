@@ -25,6 +25,10 @@ function formatCredentialData(vcData, vcType) {
     return formatPersonalDeclarationClaim(vcData)
   }
 
+  if(vcType.toUpperCase().trim()==="EIDAS"){
+    return formatEidasClaim(vcData)
+  }
+
   return vcData;
 }
 
@@ -46,6 +50,24 @@ function formatTaxisClaim(vcData) {
     },
   };
 }
+
+function formatEidasClaim(vcData) {
+  return {
+    "eidas-eID": {
+      attributes: {
+        firstName: vcData.EIDAS.eIDAS.fistName,
+        lastName: vcData.EIDAS.eIDAS.lastName,
+        dateOfBirth: vcData.EIDAS.eIDAS.dateOfBirth,
+      },
+      metadata: {
+        source: "eIDAS eID",
+        loa:  vcData.EIDAS.eIDAS.loa.charAt(0).toUpperCase() + vcData.EIDAS.eIDAS.loa.slice(1),
+        "Credential-id": vcData.id,
+      },
+    },
+  };
+}
+
 
 /*
 { TAXIS:

@@ -1,0 +1,1 @@
+{"ast":null,"code":"export default class UserSelection {\n  constructor(key, source) {\n    this.source = source; // denotes the source, i.e. eIDAS, edugain etc\n\n    this.key = key; //denotes attribute name e.g. personIdentifier\n  }\n\n}","map":null,"metadata":{},"sourceType":"module"}

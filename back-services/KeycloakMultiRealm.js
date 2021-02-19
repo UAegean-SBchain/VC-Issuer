@@ -12,12 +12,12 @@ function KeycloakMultiRealm(config, keycloakConfigs) {
     //if we are behind a reverse proxy then the realm will be the third  index of the array
     // else it will be the second
     let url = req.originalUrl;
-    // console.log(
-    //   `KeycloakMultiRealm.js, getRealmName: the req.OriginalUrl is ${req.originalUrl}`
-    // );
+    console.log(
+      `KeycloakMultiRealm.js, getRealmName: the req.OriginalUrl is ${req.originalUrl}`
+    );
 
     // for example, you could get the realmName from the path
-    // console.log(`the url is ${url}`);
+    console.log(`the url is ${url}`);
     
 
     if (process.env.BASE_PATH && req.originalUrl.indexOf(process.env.BASE_PATH) >= 0) {

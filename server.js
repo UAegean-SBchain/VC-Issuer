@@ -57,9 +57,13 @@ const SESSION_CONF = {
   secret: "this is my super super secret, secret!! shhhh",
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false },
+  cookie: {
+    secure: false,
+    maxAge: 90000
+  },
+  expires: new Date(Date.now() + (30 * 86400 * 1000)),
   store: memoryStore,
-  // maxExpiration: 90000,
+  maxExpiration: 90000,
 };
 
 if (isProduction) {
@@ -69,21 +73,18 @@ if (isProduction) {
 // keycloack confniguration
 
 const KeycloakMultiRealm = require("./back-services/KeycloakMultiRealm");
-// const SEAL_EIDAS_URI=process.env.SEAL_EIDAS_URI?process.env.SEAL_EIDAS_URI:'vm.project-seal.eu'
-// const SEAL_EIDAS_PORT=process.env.SEAL_EIDAS_PORT?process.env.SEAL_EIDAS_PORT:'8091'
-// const SEAL_EDUGAIN_URI= process.env.SEAL_EDUGAIN_URI?process.env.SEAL_EDUGAIN_URI:'vm.project-seal.eu'
-// const SEAL_EDUGAIN_PORT=process.env.SEAL_EDUGAIN_PORT?process.env.SEAL_EDUGAIN_PORT:''
+ 
 
 const eidasRealmConfig = {
-  realm: "eidas",
+  "realm": "eidas",
   "auth-server-url": "https://esmo-gateway.eu/auth",
-  "ssl-required": "none",
-  resource: "testClient",
-  credentials: {
-    secret: "317f5c96-dbf9-45f0-9c46-f8d7e7934b8c",
+  "ssl-required": "external",
+  "resource": "testEidas",
+  "credentials": {
+    "secret": "534cbdd2-0d3e-405b-83d6-e791c4bf6fa0"
   },
-  "confidential-port": 0,
-};
+  "confidential-port": 0
+}
 
 const amkaRealm = {
   realm: "amka",
@@ -108,15 +109,16 @@ const mitroRealm = {
 };
 
 const SSI = {
-  realm: "SSI",
+  "realm": "SSI-Taxis",
   "auth-server-url": "https://dss1.aegean.gr/auth",
   "ssl-required": "external",
-  resource: "testssi",
-  credentials: {
-    secret: "8c288fd3-14f9-4f1c-9e03-8ca8b3a3ec67",
+  "resource": "sbchain-taxis",
+  "verify-token-audience": true,
+  "credentials": {
+    "secret": "89d53c54-0825-4b29-9b9d-65f621654f92"
   },
-  "confidential-port": 0,
-};
+  "confidential-port": 0
+}
 
 const SBPower = {
   realm: "sbadmin",
@@ -130,15 +132,15 @@ const SBPower = {
 };
 
 const taxisReaml = {
-  realm: "taxis",
-  "auth-server-url": "https://dss1.aegean.gr/auth",
+  "realm": "taxis",
+  "auth-server-url": "https://esmo-gateway.eu/auth",
   "ssl-required": "external",
-  resource: "sbchain",
-  credentials: {
-    secret: "a8462c15-f0da-4403-9d90-698d1a5862d9",
+  "resource": "testTaxisClient",
+  "credentials": {
+    "secret": "76838e32-2ffb-4c7c-9f7f-9a5ea205fe32"
   },
-  "confidential-port": 0,
-};
+  "confidential-port": 0
+}
 
 const keycloak = new KeycloakMultiRealm({ store: memoryStore }, [
   amkaRealm,
@@ -248,6 +250,48 @@ app.prepare().then(() => {
 
   // ############ Protected by Keycloak Routes ####################
 
+
+  server.get(
+    ["/eidas/eidas-authenticate", "/sbchain/eidas/eidas-authenticate"],
+    keycloak.protect(),
+    async (req, res) => {
+      console.log("we accessed a protected root!");
+      const sessionId = req.query.session;
+      // see mockJwt.json for example response
+      const idToken = req.kauth.grant.access_token.content;
+      console.log(idToken)
+      const eidasDetails = {
+        fistName: idToken.given_name, //"Arianna",
+        lastName: idToken.family_name, //"Garbini",
+        dateOfBirth: idToken.dateOfBirth, //"05/10/1983",
+        loa: "low",
+        source: "eIDAS",
+      };
+      //store response in cache
+      let dataStore = await getSessionData(sessionId, "dataStore");
+      if (!dataStore) {
+        dataStore = {};
+      }
+      dataStore["eIDAS"] = eidasDetails;
+      await updateSessionData(sessionId, "dataStore", dataStore);
+      dataStore = await getSessionData(sessionId, "dataStore");
+      if (req.session.userData) {
+        req.session.userData.eidas = eidasDetails;
+      } else {
+        req.session.userData = {};
+        req.session.userData.eidas = eidasDetails;
+      }
+      req.session.baseUrl = process.env.BASE_PATH;
+
+      req.session.DID = true;
+      req.session.sealSession = sessionId;
+
+      return app.render(req, res, "/vc/issue/eidas", req.query);
+    }
+  );
+
+
+
   server.get(
     ["/SSI/benefit-authenticate", "/sbchain/SSI/benefit-authenticate"],
     keycloak.protect(),
@@ -255,8 +299,10 @@ app.prepare().then(() => {
       console.log(`reached SSI/benefit-authenticate`);
       const sessionId = req.query.session;
       const idToken = req.kauth.grant.access_token.content;
+      console.log(`the idToken is`)
+      console.log(idToken)
       const taxisDetails = {
-        afm: idToken.afm,
+        afm: idToken.taxisAfm,
         loa: "low",
         source: "TAXIS",
       };
@@ -296,48 +342,6 @@ app.prepare().then(() => {
       console.log("server.js:: MITRO RESPONSE");
       console.log(idToken);
       const mitroDetails = {
-        // birthcountry: idToken.birthcountry,
-        // birthdate: idToken.birthdate,
-        // birthmuniccomm: idToken.birthmuniccomm,
-        // birthmunicipal: idToken.birthmunicipal,
-        // birthmunicipalunit: idToken.birthmunicipalunit,
-        // birthprefecture: idToken.birthprefecture,
-        // eklspecialno: idToken.eklspecialno,
-        // familyShare: idToken.familyShare,
-        // fatherfirstname: idToken.fatherfirstname,
-        // fathersurname: idToken.fathersurname,
-        // firstname: idToken.firstname,
-        // gainmunrecdate: idToken.gainmunrecdate,
-        // gender: idToken.gender,
-        // grnatgaindate: idToken.grnatgaindate,
-        // mainnationality: idToken.mainnationality,
-        // mansdecentraladmin: idToken.mansdecentraladmin,
-        // mansmunicipalityname: idToken.mansmunicipalityname,
-        // mansreckind: idToken.mansreckind,
-        // mansrecordaa: idToken.mansrecordaa,
-        // mansrecordyear: idToken.mansrecordyear,
-        // maracountry: idToken.maracountry,
-        // maramuniccomm: idToken.maramuniccomm,
-        // maramunicipality: idToken.maramunicipality,
-        // maraprefecture: idToken.maraprefecture,
-        // marriageactdate: idToken.marriageactdate,
-        // marriageactno: idToken.marriageactno,
-        // marriageactro: idToken.marriageactro,
-        // marriageacttomos: idToken.marriageacttomos,
-        // marriageactyear: idToken.marriageactyear,
-        // marriagerank: idToken.marriagerank,
-        // member: idToken.member,
-        // membertype: idToken.membertype,
-        // merida: idToken.merida,
-        // motherfirstname: idToken.motherfirstname,
-        // mothergenos: idToken.mothergenos,
-        // mothersurname: idToken.mothersurname,
-        // municipalityname: idToken.municipalityname,
-        // reckind: idToken.reckind,
-        // secondname: idToken.secondname,
-        // spouseagreementrank: idToken.spouseagreementrank,
-        // spousemarriagerank: idToken.spousemarriagerank,
-        // surname: idToken.surname,
         gender: idToken.gender,
         nationality: idToken.mainnationality,
         singleParent: idToken.spousemarriagerank && idToken.parenthood ? "false" : idToken.parenthood ? "true" : "false",
@@ -467,6 +471,48 @@ app.prepare().then(() => {
       req.session.sealSession = sessionId;
 
       return app.render(req, res, "/vc/issue/taxis", req.query);
+    }
+  );
+
+
+  server.get(
+    ["/taxis/taxisen-authenticate", "/sbchain/taxis/taxisen-authenticate"],
+    keycloak.protect(),
+    async (req, res) => {
+      console.log("we accessed a protected root!");
+      const sessionId = req.query.session;
+      // see mockJwt.json for example response
+      const idToken = req.kauth.grant.access_token.content;
+      const taxisDetails = {
+        fistName: idToken.fistName, //"Νικόλαος",
+        afm: idToken.afm,
+        lastName: idToken.lastName, //"Τριανταφύλλου",
+        fathersName: idToken.fathersName,
+        mothersName: idToken.mothersName,
+        dateOfBirth: idToken.dateOfBirth, //"05/10/1983",
+        loa: "low",
+        source: "TAXIS",
+      };
+      //store response in cache
+      let dataStore = await getSessionData(sessionId, "dataStore");
+      if (!dataStore) {
+        dataStore = {};
+      }
+      dataStore["TAXIS"] = taxisDetails;
+      await updateSessionData(sessionId, "dataStore", dataStore);
+      dataStore = await getSessionData(sessionId, "dataStore");
+      if (req.session.userData) {
+        req.session.userData.taxis = taxisDetails;
+      } else {
+        req.session.userData = {};
+        req.session.userData.taxis = taxisDetails;
+      }
+      req.session.baseUrl = process.env.BASE_PATH;
+
+      req.session.DID = true;
+      req.session.sealSession = sessionId;
+
+      return app.render(req, res, "/vc/issue/taxisen", req.query);
     }
   );
 
@@ -650,6 +696,13 @@ app.prepare().then(() => {
   //   return app.render(req, res, "/vc/issue/mitromock", req.query);
   // });
 
+
+  server.get(["/vc/issue/eidas"], async (req, res) => {
+    req.session.endpoint = endpoint;
+    req.session.baseUrl = process.env.BASE_PATH;
+    return app.render(req, res, "/vc/issue/eidas", req.query);
+  });
+
   server.get(["/vc/issue/self"], async (req, res) => {
     req.session.endpoint = endpoint;
     req.session.baseUrl = process.env.BASE_PATH;
@@ -692,6 +745,7 @@ app.prepare().then(() => {
     async (req, res) => {
       console.log("server.js:: /endorse/ebill/store");
       req.endpoint = endpoint;
+      req.baseUrl=process.env.BASE_PATH;
       requestEbillEndorsement(req, res, app);
     }
   );
@@ -707,6 +761,7 @@ app.prepare().then(() => {
     console.log(did);
     req.session.endorsement = endorsement;
     req.session.sessionId = sessionId;
+    req.session.baseUrl = process.env.BASE_PATH;
     return app.render(req, res, "/endorse/issue/authorize-ebill", req.query);
   });
 
@@ -728,7 +783,8 @@ app.prepare().then(() => {
           } catch (e) {
             console.log(e);
           }
-          let result = JSON.parse(body).fields[1].value;
+          console.log(JSON.parse(body))
+          let result = JSON.parse(body).step_info.fields.free_text.value;
           let expected =
             `Επαλήθευσα τα στοιχεία\nΌνομα: ${endorsement.ebill.name}\nΕπώνυμο: ${endorsement.ebill.surname}\nΠατρώνυμο: ${endorsement.ebill.fathersName}\nAFM: ${endorsement.ebill.afm}\nΟδός: ${endorsement.ebill.street}\nΑριθμός: ${endorsement.ebill.number}\nΔήμος: ${endorsement.ebill.municipality}\nΤ.Κ.: ${endorsement.ebill.po}\nΙδιοκτησιακό καθεστώς: ${endorsement.ebill.ownership}\nΠαροχή: ${endorsement.ebill.supplyType}\nΜετρητής ΔΕΔΔΗΕ: ${endorsement.ebill.meterNumber}\nκαι τα βρήκα ακριβή`
           //clean up strings
@@ -783,6 +839,7 @@ app.prepare().then(() => {
     // console.log(did);
     req.session.endorsement = endorsement;
     req.session.sessionId = sessionId;
+    req.session.baseUrl = process.env.BASE_PATH;
     return app.render(req, res, "/endorse/issue/authorize-contact", req.query);
   });
 
@@ -804,7 +861,7 @@ app.prepare().then(() => {
           } catch (e) {
             console.log(e);
           }
-          let result = JSON.parse(body).fields[1].value;
+          let result = JSON.parse(body).step_info.fields.free_text.value;
           let expected =
             `Επαλήθευσα τα στοιχεία\nΌνομα: ${endorsement.contact.name}\nΕπώνυμο: ${endorsement.contact.surname}\nΔιεύθυνση email: ${endorsement.contact.email}\nΑριθμός Σταθερού Τηλεφώνου: ${endorsement.contact.landline}\nΑριθμός Κινητού Τηλεφώνου: ${endorsement.contact.mobile}\nΑριθμός Τραπεζικού Λογαριασμού (IBAN): ${endorsement.contact.iban}\nκαι τα βρήκα ακριβή`
 

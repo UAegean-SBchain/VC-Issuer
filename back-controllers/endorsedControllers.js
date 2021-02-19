@@ -162,8 +162,9 @@ async function requestEbillEndorsement(req, res, app) {
   //TODO email the endorser
   // console.log(`will email :: ${eBillDetails.endorser}`);
     let serverUri = req.endpoint? req.endpoint:"localhost:5000"
-    let approveLink = `${serverUri}/endorse/ebill/accept?session=${sessionId}`
-    let rejectLink = `${serverUri}/endorse/ebill/reject?session=${sessionId}`
+    console.log(`baseurl ${req.baseUrl}`)
+    let approveLink = req.baseUrl?`${serverUri}/${req.baseUrl}/endorse/ebill/accept?session=${sessionId}`:`${serverUri}/endorse/ebill/accept?session=${sessionId}`
+    let rejectLink = req.baseUrl?`${serverUri}/${req.baseUrl}/endorse/ebill/reject?session=${sessionId}`:`${serverUri}/endorse/ebill/reject?session=${sessionId}`
 
   let body = `
   <h3>This a credential Endorsement request </h3> 

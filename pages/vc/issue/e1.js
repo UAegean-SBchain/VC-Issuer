@@ -89,7 +89,7 @@ class IssueE1 extends React.Component {
     //returned value here is getting mered with the mapstatetoprops
     // mapstatetoprops overrides these values if they match
     return {
-      noUserError:  req.session.error,
+      noUserError:  req?req.session.error:null,
       sessionData: userSessionData,
       qrData: reduxStore.getState().qrData,
       vcSent: false,

@@ -96,7 +96,13 @@ async function sealIssueVC(req, res) {
 
   credentials
     .createVerification({
+      "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+      ],
+      "type": ["VerifiableCredential", "eIDASCredential"],
       sub: didResp.did,
+      "issuer": "University of the Aegean",
+      "issuanceDate":  (Math.floor((new Date()).getTime() / 1000) + 30 * 24 * 60 * 60),
       exp:
         (Math.floor(expirationDate.getTime() / 1000) + 30 * 24 * 60 * 60),
       claim: vcData,

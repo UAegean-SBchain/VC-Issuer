@@ -36,7 +36,7 @@ class IssueBenefitButton extends React.Component {
         disabled={!this.props.hasRequiredAttributes}
         onClick={this.click}
       >
-        Issue Verifiable Claim
+        Έκδοση Ταυτότητας
       </Button>
       // </Link>
     );

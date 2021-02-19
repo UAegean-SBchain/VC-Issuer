@@ -1,13 +1,8 @@
 {
-  "polyfillFiles": [
-    "static/chunks/polyfills.js"
-  ],
   "devFiles": [
-    "static/chunks/react-refresh.js"
-  ],
-  "ampDevFiles": [
-    "static/chunks/webpack.js",
-    "static/chunks/amp.js"
+    "static/runtime/react-refresh.js",
+    "static/development/dll/dll_298d2e84f10fe55796cf.js",
+    "static/development/dll/dll_298d2e84f10fe55796cf.js.map"
   ],
   "lowPriorityFiles": [
     "static/development/_buildManifest.js",
@@ -15,69 +10,33 @@
   ],
   "pages": {
     "/": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
+      "static/runtime/webpack.js",
       "static/css/styles.chunk.css",
       "static/chunks/styles.js",
-      "static/chunks/pages/index.js"
+      "static/runtime/main.js"
     ],
     "/_app": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/chunks/pages/_app.js"
+      "static/runtime/webpack.js",
+      "static/runtime/main.js"
     ],
     "/_error": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/chunks/pages/_error.js"
+      "static/runtime/webpack.js",
+      "static/runtime/main.js"
     ],
-    "/endorse/issue/contact": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
+    "/_polyfills": [
+      "static/runtime/polyfills.js"
+    ],
+    "/index": [
+      "static/runtime/webpack.js",
       "static/css/styles.chunk.css",
       "static/chunks/styles.js",
-      "static/chunks/pages/endorse/issue/contact.js"
-    ],
-    "/endorse/issue/ebill": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/css/styles.chunk.css",
-      "static/chunks/styles.js",
-      "static/chunks/pages/endorse/issue/ebill.js"
-    ],
-    "/next/dist/pages/_error": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/chunks/pages/next/dist/pages/_error.js"
+      "static/runtime/main.js"
     ],
     "/vc/issue/e1": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
+      "static/runtime/webpack.js",
       "static/css/styles.chunk.css",
       "static/chunks/styles.js",
-      "static/chunks/pages/vc/issue/e1.js"
-    ],
-    "/vc/issue/mitro": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/css/styles.chunk.css",
-      "static/chunks/styles.js",
-      "static/chunks/pages/vc/issue/mitro.js"
-    ],
-    "/vc/issue/self": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/css/styles.chunk.css",
-      "static/chunks/styles.js",
-      "static/chunks/pages/vc/issue/self.js"
-    ],
-    "/vc/issue/taxis": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/css/styles.chunk.css",
-      "static/chunks/styles.js",
-      "static/chunks/pages/vc/issue/taxis.js"
+      "static/runtime/main.js"
     ]
-  },
-  "ampFirstPages": []
+  }
 }

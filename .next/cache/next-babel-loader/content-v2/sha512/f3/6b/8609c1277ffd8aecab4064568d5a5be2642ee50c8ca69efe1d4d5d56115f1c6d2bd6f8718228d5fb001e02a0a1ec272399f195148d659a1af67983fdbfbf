@@ -1,0 +1,1 @@
+{"ast":null,"code":"import MobileDetect from \"mobile-detect\";\n\nconst isMobile = () => {\n  if (false) {\n    const md = new MobileDetect(window.navigator.userAgent);\n    return Boolean(md.mobile() || md.phone());\n  }\n\n  return false;\n};\n\nexport default isMobile;","map":null,"metadata":{},"sourceType":"module"}

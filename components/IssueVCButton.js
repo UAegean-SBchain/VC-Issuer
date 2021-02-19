@@ -30,13 +30,15 @@ class IssueVCButton extends React.Component {
   }
 
   render() {
+    const textMessage = this.props.text?this.props.text:"Έκδοση"
+
     return (
       <Button
         variant="primary"
         disabled={!this.props.hasRequiredAttributes}
         onClick={this.click}
       >
-        Έκδοση
+        {textMessage}
       </Button>
       // </Link>
     );

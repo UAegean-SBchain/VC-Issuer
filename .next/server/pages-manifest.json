@@ -1,13 +1,1 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/next/dist/pages/_error": "pages/next/dist/pages/_error.js",
-  "/": "pages/index.js",
-  "/endorse/issue/contact": "pages/endorse/issue/contact.js",
-  "/vc/issue/taxis": "pages/vc/issue/taxis.js",
-  "/vc/issue/mitro": "pages/vc/issue/mitro.js",
-  "/endorse/issue/ebill": "pages/endorse/issue/ebill.js",
-  "/vc/issue/e1": "pages/vc/issue/e1.js",
-  "/vc/issue/self": "pages/vc/issue/self.js"
-}
+{"/_app":"static/development/pages/_app.js","/_document":"static/development/pages/_document.js","/_error":"static/development/pages/_error.js","/index":"static/development/pages/index.js","/vc/issue/e1":"static/development/pages/vc/issue/e1.js","/":"static/development/pages/index.js"}

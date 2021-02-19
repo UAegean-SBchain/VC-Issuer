@@ -13,6 +13,8 @@ const QrPrompt = props => {
     );
   });
 
+  let message =`Please scan the following QR code, with your mobile phone's uPort app, to access the ${props.issuer?props.issuer:"SBChain"}  Issuer`
+
   return (
     <Container style={{ marginTop: "3rem" }}>
       <Row className="box-fill-v">
@@ -21,7 +23,7 @@ const QrPrompt = props => {
             <Row>
               <Col>
                 <p id="uPortMessage">
-                  Σκανάρετε την ακόλουθη εικόνα (QR code) με την εφαρμογή "uPort Wallet" το κινητού σας, για να αποκτήσετε πρόσβαση στην υπηρεσία
+               {message}
                 </p>
                 <style jsx>
                   {`
@@ -38,7 +40,7 @@ const QrPrompt = props => {
               </Col>
             </Row>
             <Row>
-              Δεν έχετε τη εφαρμογή "uPort Wallet"? Κατεβάστε τη δωρεάν από το αντίστοιχο app store
+              Don't have the "uPort Wallet" app? Download it for free from your prefered app store!
             </Row>
             <Row>
               <Col>
@@ -47,7 +49,7 @@ const QrPrompt = props => {
                   target="_blank"
                   className="w-inline-block"
                 >
-                  <img className="img-fluid" src={`/app-store.png`} />
+                  <img className="img-fluid" src={`../../app-store.png`} />
                 </a>
               </Col>
               <Col>
@@ -56,7 +58,7 @@ const QrPrompt = props => {
                   target="_blank"
                   className="w-inline-block"
                 >
-                  <img className="img-fluid" src={`/play-store.png`} />
+                  <img className="img-fluid" src={`../../play-store.png`} />
                 </a>
               </Col>
             </Row>
